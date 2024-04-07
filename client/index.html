@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPS Client</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+  <h1>GPS Client</h1>
+  <h1>Labas Laura, pagaliau rodo mano koordinates</h1>
+  <h1 id="dynamicText1"></h1>
+  <h1 id="dynamicText2"></h1>
+  <div id="map" style="height: 400px;"></div>
+  <script>
+    const socket = io('http://192.168.1.104:1337');
+
+    // Function to send GPS coordinates to the server
+
+    //   const lat = Math.random() * 90;  // Generate random latitude
+    //   const lng = Math.random() * 180; // Generate random longitude
+    //   const coordinates = { lat, lng };
+    //   socket.emit('updateCoordinates', coordinates); // Send coordinates to server
+    //   socket.on('updateCoordinatesForWeb', (data) => {
+    //     document.getElementById('dynamicText1').innerText = "Latitude: " + data.lat;
+    //   document.getElementById('dynamicText2').innerText = "Longtitude: " + data.lng;
+
+    //     });
+    //     console.log("data")
+    
+
+    // Send GPS coordinates every second
+
+
+    // // Update the h1 element with received text
+    // socket.on('oneWayChat', (data) => {
+    //   console.log('Received chat:', data);
+    //   document.getElementById('dynamicText').innerText = data;
+    // });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Define the actual coordinates you want to zoom into
+    const initialLat = 54.687157; // Example latitude (Vilnius)
+    const initialLng = 25.279652; // Example longitude (Vilnius)
+    const initialZoom = 12; // Initial zoom level
+
+    // Initialize the map at the specified coordinates and zoom level
+    const map = L.map('map').setView([initialLat, initialLng], initialZoom);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Listen for updates from the server
+    socket.on('updateCoordinatesForWeb', (data) => {
+        console.log('Received updated coordinates:', data);
+
+        // Clear existing markers
+        map.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+
+        // Add a new marker with the latest coordinates
+        L.marker([data.lat, data.lng]).addTo(map);
+    });
+});
+    
+  </script>
+</body>
+</html>
